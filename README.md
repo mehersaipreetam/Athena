@@ -1,4 +1,4 @@
-# Athena - Personal AI Assistant
+# Athena - Your Personal Assistant
 
 **Athena** is a modular, real-time voice assistant built in Python.  
 It integrates offline speech recognition, generative AI, and local text-to-speech.
