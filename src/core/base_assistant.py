@@ -1,3 +1,4 @@
+import time
 from voice.recognition.vosk_recognizer import VoskRecognizer
 from voice.synthesis.piper import Piper
 from llm.gemini_llm import GeminiLLM
@@ -27,14 +28,17 @@ def run_assistant():
                 print(f"\nYou said: {text}")
 
                 # Exit conditions
-                if text.lower() in ["stop", "shutdown", "goodbye"]:
+                if text.lower() in ["stop", "shutdown", "bye"]:
                     tts_engine.speak("Goodbye!")
                     break
 
                 # Generate LLM response
                 response = llm.generate_response(text)
                 print(f"Athena: {response}")
-                tts_engine.speak(text)
+                speech_recognizer.pause()
+                tts_engine.speak(response)
+                time.sleep(1)
+                speech_recognizer.resume()
 
     except KeyboardInterrupt:
         print("\n[Athena] Shutting down gracefully.")

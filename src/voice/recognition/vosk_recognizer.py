@@ -16,11 +16,13 @@ class VoskRecognizer(BaseVoiceRecognizer):
         self.model = Model(model_path)
         self.recognizer = KaldiRecognizer(self.model, samplerate)
         print("[VOSK] Model loaded successfully.")
+        self.listening = True
 
     def _callback(self, indata, frames, time, status):
-        if status:
-            print(f"[VOSK] Status: {status}", flush=True)
-        self.audio_q.put(bytes(indata))
+        if self.listening:
+            if status:
+                print(f"[VOSK] Status: {status}", flush=True)
+            self.audio_q.put(bytes(indata))
 
     def listen(self):
         """
@@ -51,6 +53,12 @@ class VoskRecognizer(BaseVoiceRecognizer):
             except KeyboardInterrupt:
                 print("\n[VOSK] Stopped by user.")
                 self._running = False
+
+    def pause(self):
+        self.listening = False
+
+    def resume(self):
+        self.listening = True
 
     def stop(self):
         self._running = False

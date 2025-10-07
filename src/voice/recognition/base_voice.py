@@ -14,6 +14,16 @@ class BaseVoiceRecognizer(ABC):
         pass
 
     @abstractmethod
+    def pause(self):
+        """Pause the recognizer."""
+        pass
+
+    @abstractmethod
+    def resume(self):
+        """Resume feeding audio to recognizer"""
+        pass
+
+    @abstractmethod
     def stop(self):
         """Gracefully stop the recognizer."""
         pass
