@@ -1,6 +1,4 @@
-def main():
-    print("Hello from athena!")
-
+from core.base_assistant import run_assistant
 
 if __name__ == "__main__":
-    main()
+    run_assistant()

@@ -1,35 +1,42 @@
-import os
-import speech_recognition as sr
-import google.generativeai as genai
-import pyttsx3
+from voice.recognition.vosk_recognizer import VoskRecognizer
+from voice.synthesis.piper import Piper
+from llm.gemini_llm import GeminiLLM
 from dotenv import load_dotenv, find_dotenv
+import os
 
-load_dotenv(find_dotenv())  # Load environment variables from .env file
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-engine = pyttsx3.init()
-recognizer = sr.Recognizer()
-mic = sr.Microphone()
+load_dotenv(find_dotenv())
 
-def speak(text):
-    engine.say(text)
-    engine.runAndWait()
+VOSK_MODEL_PATH = os.getenv("VOSK_MODEL_PATH")
+PIPER_VOICE_PATH = os.getenv("PIPER_VOICE_PATH")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+speech_recognizer = VoskRecognizer(model_path=VOSK_MODEL_PATH)
+tts_engine = Piper(voice_path=PIPER_VOICE_PATH)
+llm = GeminiLLM(api_key=GEMINI_API_KEY)
 
 
-print("Athena is online... 🎙️")
-
-while True:
-    with mic as source:
-        recognizer.adjust_for_ambient_noise(source)
-        print("Listening...")
-        audio = recognizer.listen(source)
+# --- Core assistant loop ---
+def run_assistant():
+    print("Athena is online... 🎙️")
     try:
-        query = recognizer.recognize_whisper(audio)  # or recognize_google if online
-        print(f"You: {query}")
-        if query.lower() in ["stop", "shutdown", "goodbye"]:
-            speak("Goodbye!")
-            break
-        answer = ask_gemini(query)
-        print(f"Jarvis: {answer}")
-        speak(answer)
-    except Exception as e:
-        print("Error:", e)
+        for text, is_final in speech_recognizer.listen():
+            if not text:
+                continue
+
+            if is_final:
+                print(f"\nYou said: {text}")
+
+                # Exit conditions
+                if text.lower() in ["stop", "shutdown", "goodbye"]:
+                    tts_engine.speak("Goodbye!")
+                    break
+
+                # Generate LLM response
+                response = llm.generate_response(text)
+                print(f"Athena: {response}")
+                tts_engine.speak(text)
+
+    except KeyboardInterrupt:
+        print("\n[Athena] Shutting down gracefully.")
+    finally:
+        speech_recognizer.stop()
