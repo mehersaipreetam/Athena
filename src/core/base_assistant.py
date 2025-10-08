@@ -25,7 +25,6 @@ def run_assistant():
         print("Athena is online... 🎙️")
         try:
             for text, is_final in speech_recognizer.listen():
-                # Update partial text in TUI
                 if text:
                     if not is_final:
                         live.update(tui.render())
@@ -47,17 +46,12 @@ def run_assistant():
                 tui.set_thinking(True)
                 live.update(tui.render())
 
-                # Exit conditions
-
-
-                # Generate response
                 response = llm.generate_response(text)
                 tui.set_thinking(False)
                 tui.add_message("Athena", response)
                 tui.set_status("Speaking... 🗣️")
                 live.update(tui.render())
 
-                # Speak the response
                 try:
                     clean_response = re.sub(r"[^A-Za-z0-9\s\.,!]", "", response)
                 except Exception:
