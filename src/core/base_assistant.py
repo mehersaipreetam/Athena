@@ -19,60 +19,62 @@ llm = GeminiLLM(api_key=GEMINI_API_KEY)
 
 def run_assistant():
     tui = TUIManager()
-    tui.update_status("Listening... 🎙️")
+    tui.set_status("Listening... 🎙️")
 
     def loop(live, tui):
         print("Athena is online... 🎙️")
-
         try:
             for text, is_final in speech_recognizer.listen():
                 # Update partial text in TUI
                 if text:
-                    tui.update_partial(text)
-                    live.update(tui.render())
+                    if not is_final:
+                        live.update(tui.render())
 
-                # Skip empty partials
                 if not is_final or not text.strip():
                     continue
 
                 # Final recognized speech
-                tui.update_final(text)
-                tui.update_status("Thinking... 🤔")
+                tui.add_message("You", text)
+
+                if text.lower() in ["stop", "shutdown", "bye", "goodbye"]:
+                    tui.add_message("Athena", "Goodbye!")
+                    tui.set_status("Shutting down 👋")
+                    live.update(tui.render())
+                    tts_engine.speak("Goodbye!")
+                    break
+
+                tui.set_status("Thinking... 🤔")
+                tui.set_thinking(True)
                 live.update(tui.render())
 
                 # Exit conditions
-                if text.lower() in ["stop", "shutdown", "bye", "goodbye"]:
-                    tts_engine.speak("Goodbye!")
-                    tui.update_status("Shutting down 👋")
-                    live.update(tui.render())
-                    break
+
 
                 # Generate response
                 response = llm.generate_response(text)
-                tui.update_response(response)
-                tui.update_status("Speaking... 🗣️")
+                tui.set_thinking(False)
+                tui.add_message("Athena", response)
+                tui.set_status("Speaking... 🗣️")
                 live.update(tui.render())
 
-                # Pause recognition while speaking
-                speech_recognizer.pause()
+                # Speak the response
                 try:
-                    updated_response = re.sub(r"[^A-Za-z0-9\s\.,!]", "", response)
+                    clean_response = re.sub(r"[^A-Za-z0-9\s\.,!]", "", response)
                 except Exception:
-                    # Fallback to original response if regex fails for any reason
-                    updated_response = response
-                tts_engine.speak(updated_response)
+                    clean_response = response
+                speech_recognizer.pause()
+                tts_engine.speak(clean_response)
                 time.sleep(0.5)
                 speech_recognizer.resume()
 
                 # Back to listening
-                tui.update_status("Listening... 🎙️")
+                tui.set_status("Listening... 🎙️")
                 live.update(tui.render())
 
         except KeyboardInterrupt:
-            tui.update_status("Shutting down gracefully 💤")
+            tui.set_status("Shutting down gracefully 💤")
             live.update(tui.render())
         finally:
             speech_recognizer.stop()
 
     tui.run_live(loop)
-
