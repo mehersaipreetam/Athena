@@ -9,7 +9,7 @@ It integrates offline speech recognition, generative AI, and local text-to-speec
 - **Speech Recognition:** Offline STT using Vosk.
 - **Text-to-Speech:** Piper TTS (streaming per sentence) with modular engine support.
 - **LLM Integration:** Google Gemini for generating conversational responses.
-- **Core Loop:** C ontinuous listening, response generation, and speech output. 
+- **Core Loop:** Continuous listening, response generation, and speech output. 
 - **Exit Commands:** `stop`, `shutdown`, `goodbye`.
 
 ---
