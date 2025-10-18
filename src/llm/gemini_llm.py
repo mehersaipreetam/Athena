@@ -9,7 +9,9 @@ class GeminiLLM(BaseLLM):
 
     def generate_response(self, prompt: str, **kwargs) -> str:
         try:
-            response = self.model.generate_content(prompt, **kwargs)
+            system_instructions = "You are Athena, a friendly and articulate AI assistant. Assume your users are smart and well-informed. Your responses are spoken aloud, so use a natural, conversational tone. Avoid symbols, lists, or special characters. Keep answers concise and engaging - like you're talking to a person. If more detail is requested, expand thoughtfully and clearly"
+            updated_prompt = f"{system_instructions}\n\nUser: {prompt}\nAthena:"
+            response = self.model.generate_content(updated_prompt, **kwargs)
             return response.text.strip() if hasattr(response, "text") else str(response)
         except Exception as e:
             return f"[Gemini Error] {e}"

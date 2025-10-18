@@ -1,9 +1,11 @@
 import time
+import os
+import re
+from dotenv import load_dotenv, find_dotenv
 from voice.recognition.vosk_recognizer import VoskRecognizer
 from voice.synthesis.piper import Piper
 from llm.gemini_llm import GeminiLLM
-from dotenv import load_dotenv, find_dotenv
-import os
+from tui.tui_manager import TUIManager
 
 load_dotenv(find_dotenv())
 
@@ -15,32 +17,58 @@ speech_recognizer = VoskRecognizer(model_path=VOSK_MODEL_PATH)
 tts_engine = Piper(voice_path=PIPER_VOICE_PATH)
 llm = GeminiLLM(api_key=GEMINI_API_KEY)
 
-
-# --- Core assistant loop ---
 def run_assistant():
-    print("Athena is online... 🎙️")
-    try:
-        for text, is_final in speech_recognizer.listen():
-            if not text:
-                continue
+    tui = TUIManager()
+    tui.set_status("Listening... 🎙️")
 
-            if is_final:
-                print(f"\nYou said: {text}")
+    def loop(live, tui):
+        print("Athena is online... 🎙️")
+        try:
+            for text, is_final in speech_recognizer.listen():
+                if text:
+                    if not is_final:
+                        live.update(tui.render())
 
-                # Exit conditions
-                if text.lower() in ["stop", "shutdown", "bye"]:
+                if not is_final or not text.strip():
+                    continue
+
+                # Final recognized speech
+                tui.add_message("You", text)
+
+                if text.lower() in ["stop", "shutdown", "bye", "goodbye"]:
+                    tui.add_message("Athena", "Goodbye!")
+                    tui.set_status("Shutting down 👋")
+                    live.update(tui.render())
                     tts_engine.speak("Goodbye!")
                     break
 
-                # Generate LLM response
+                tui.set_status("Thinking... 🤔")
+                tui.set_thinking(True)
+                live.update(tui.render())
+
                 response = llm.generate_response(text)
-                print(f"Athena: {response}")
+                tui.set_thinking(False)
+                tui.add_message("Athena", response)
+                tui.set_status("Speaking... 🗣️")
+                live.update(tui.render())
+
+                try:
+                    clean_response = re.sub(r"[^A-Za-z0-9\s\.,!]", "", response)
+                except Exception:
+                    clean_response = response
                 speech_recognizer.pause()
-                tts_engine.speak(response)
-                time.sleep(1)
+                tts_engine.speak(clean_response)
+                time.sleep(0.5)
                 speech_recognizer.resume()
 
-    except KeyboardInterrupt:
-        print("\n[Athena] Shutting down gracefully.")
-    finally:
-        speech_recognizer.stop()
+                # Back to listening
+                tui.set_status("Listening... 🎙️")
+                live.update(tui.render())
+
+        except KeyboardInterrupt:
+            tui.set_status("Shutting down gracefully 💤")
+            live.update(tui.render())
+        finally:
+            speech_recognizer.stop()
+
+    tui.run_live(loop)
