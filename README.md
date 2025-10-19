@@ -25,4 +25,11 @@ It integrates offline speech recognition, generative AI, and local text-to-speec
 python main.py
 ```
 
+## Demo
+
+> Here's a quick demonstration of how it works:
+
+<p align="center">
+  <img src="assets/demo.gif" width="700"/>
+</p>
 Athena listens, responds, and runs until you say stop or shutdown.
