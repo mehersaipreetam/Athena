@@ -33,3 +33,21 @@ python main.py
   <img src="assets/demo.gif" width="700"/>
 </p>
 Athena listens, responds, and runs until you say stop or shutdown.
+
+---
+
+## Contributing
+
+Contributions, feature ideas, and improvements are welcome!
+
+- **Found a bug?** → Open an **Issue**
+- **Have a feature idea?** → Start a **Discussion** or create an **Enhancement Issue**
+- **Want to contribute code?**
+  1. Fork the repository
+  2. Create a new branch: `feature/<your-idea>`
+  3. Commit your changes and push
+  4. Submit a **Pull Request**
+
+Please keep contributions modular and follow the existing code structure under `src/`.
+
+---
