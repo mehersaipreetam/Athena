@@ -1,9 +1,9 @@
 [project]
 name = "athena"
 version = "0.1.0"
-description = "Add your description here"
+description = "Athena Voice Assistant with MCP Tools"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "fastmcp>=2.0.0",
     "google-generativeai>=0.8.5",
@@ -17,7 +17,17 @@ dependencies = [
     "vosk>=0.3.45",
 ]
 
+[project.scripts]
+athena = "core.base_assistant:run_assistant"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [dependency-groups]
 dev = [
     "black>=25.9.0",
 ]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
