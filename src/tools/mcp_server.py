@@ -22,9 +22,11 @@ if src_dir not in sys.path:
 
 from mcp.server.fastmcp import FastMCP
 from tools.time_tool import get_current_time
+from tools.info_tool import get_info
 
 mcp = FastMCP("Athena Tools")
 mcp.tool()(get_current_time)
+mcp.tool()(get_info)
 
 if __name__ == "__main__":
     mcp.run()
