@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATHENA - Jarvis-like AI Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Markdown and Code Highlighting -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@14.0.0/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+                        <path d="M16 6V22M6 16H22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="16" cy="16" r="4" fill="currentColor"/>
+                    </svg>
+                    <span class="logo-text">ATHENA</span>
+                </div>
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text" id="statusText">Initializing...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn side-panel-toggle" id="sidePanelToggle" title="Toggle Panel" aria-label="Toggle side panel">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="3" x2="21" y2="21"></line>
+                        <path d="M21 12H3M12 3v18"></path>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="skillsBtn" title="Skills">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <path d="M8 21h8M12 17v4"/>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="memoryBtn" title="Memory">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="15" y1="2" x2="15" y2="6"/>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="settingsBtn" title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Left Panel: Conversation -->
+            <section class="panel conversation-panel">
+                <div class="panel-header">
+                    <h2>Conversation</h2>
+                    <div class="panel-actions">
+                        <button class="icon-btn small" id="clearChat" title="Clear chat">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="messages-container" id="messagesContainer">
+                    <div class="messages" id="messages">
+                        <!-- Messages will be appended here -->
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+                <div class="input-area">
+                    <form id="chatForm" class="chat-form">
+                        <textarea
+                            id="textInput"
+                            class="text-input"
+                            placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
+                            autocomplete="off"
+                            spellcheck="false"
+                            rows="1"
+                        ></textarea>
+                        <button type="button" class="mic-btn" id="micBtn" aria-label="Voice input" title="Voice Input">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        </button>
+                        <button type="submit" class="send-btn" id="sendBtn" aria-label="Send message">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </form>
+                    <div class="input-hints">
+                        <kbd>Enter</kbd> Send &nbsp;
+                        <kbd>Shift</kbd>+<kbd>Enter</kbd> New line &nbsp;
+                        <kbd>/</kbd> Commands
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Tabs for Skills, Memory, Stats -->
+            <aside class="panel side-panel">
+                <div class="tabs" id="tabs">
+                    <button class="tab-btn active" data-tab="skills">Skills</button>
+                    <button class="tab-btn" data-tab="memory">Memory</button>
+                    <button class="tab-btn" data-tab="stats">Stats</button>
+                </div>
+                <div class="tab-content">
+                    <!-- Skills Tab -->
+                    <div class="tab-pane active" id="skillsPane">
+                        <div class="pane-header">
+                            <h3>Available Skills</h3>
+                            <button class="icon-btn small" id="refreshSkills" title="Refresh skills">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M23 4v6h-6"></path>
+                                    <path d="M1 20v-6h6"></path>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="skills-list" id="skillsList">
+                            <div class="loading">Loading skills...</div>
+                        </div>
+                        <div class="forge-section">
+                            <h4>Forge New Skill</h4>
+                            <textarea id="forgeInput" placeholder="Describe the skill you need... (e.g., 'Create a tool that fetches stock prices')"></textarea>
+                            <button class="btn primary" id="forgeBtn">Forge Skill</button>
+                        </div>
+                    </div>
+
+                    <!-- Memory Tab -->
+                    <div class="tab-pane" id="memoryPane">
+                        <div class="pane-header">
+                            <h3>Memory Search</h3>
+                        </div>
+                        <div class="memory-search">
+                            <input type="text" id="memoryQuery" placeholder="Search memories...">
+                            <button class="btn primary" id="searchMemory">Search</button>
+                        </div>
+                        <div class="memory-results" id="memoryResults">
+                            <p class="empty-state">Search your long-term memory</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats Tab -->
+                    <div class="tab-pane" id="statsPane">
+                        <div class="stats-grid" id="statsGrid">
+                            <div class="stat-card">
+                                <div class="stat-icon">💾</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Memory</span>
+                                    <span class="stat-value" id="statMemory">--</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🛠️</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Skills</span>
+                                    <span class="stat-value" id="statSkills">--</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💬</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Conversations</span>
+                                    <span class="stat-value" id="statConversations">--</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🧠</div>
+                                <div class="stat-info">
+                                    <span class="stat-label">Persona</span>
+                                    <span class="stat-value" id="statPersona">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="system-info">
+                            <h4>System</h4>
+                            <dl id="systemInfo">
+                                <dt>Uptime</dt><dd id="uptime">--</dd>
+                                <dt>Model</dt><dd id="modelInfo">--</dd>
+                                <dt>Mode</dt><dd id="modeInfo">Web</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Modals -->
+        <div class="modal-overlay" id="skillModal" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Forge New Skill</h3>
+                    <button class="modal-close" id="closeSkillModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="modalForgeInput" placeholder="Describe the skill you need..."></textarea>
+                    <div class="modal-actions">
+                        <button class="btn secondary" id="cancelForge">Cancel</button>
+                        <button class="btn primary" id="confirmForge">Forge</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

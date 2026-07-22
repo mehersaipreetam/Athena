@@ -1,0 +1,31 @@
+# Athena - Lean Jarvis-like AI Assistant
+# Minimal dependencies for maximum capability
+
+# Core
+pydantic>=2.7
+litellm>=1.40
+
+# Voice (choose one stack)
+faster-whisper>=1.0
+piper-tts>=1.2
+sounddevice>=0.4
+numpy>=1.24
+
+# Optional advanced voice (uncomment if needed)
+# nemo_toolkit[asr]>=1.22
+# kokoro>=0.8
+# silero-vad>=5.1
+
+# Database
+sqlite-utils>=3.30  # or just use built-in sqlite3
+
+# TUI (optional)
+rich>=13.7
+
+# Utilities
+python-dotenv>=1.0
+psutil>=5.9  # for system monitoring
+
+# Testing
+pytest>=7.4
+pytest-asyncio>=0.21

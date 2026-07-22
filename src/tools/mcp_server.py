@@ -1,32 +1,46 @@
 """
 Athena MCP Server
 
-Central MCP server that imports and exposes all tools.
-Run this as a standalone process or connect via FastMCP Client.
-
-Usage:
-    # Run standalone (for testing with MCP Inspector)
-    python mcp_server.py
-    
-    # Connect programmatically
-    from fastmcp import Client
-    async with Client("tools/mcp_server.py") as client:
-        result = await client.call_tool("get_current_time", {})
+Exposes Athena tools and dynamic skills via the MCP protocol.
 """
 import sys
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 src_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if src_dir not in sys.path:
     sys.path.insert(0, src_dir)
 
-from mcp.server.fastmcp import FastMCP
-from tools.time_tool import get_current_time
-from tools.info_tool import get_info
+try:
+    from mcp.server.fastmcp import FastMCP
+    FAST_MCP_AVAILABLE = True
+except ImportError:
+    FAST_MCP_AVAILABLE = False
 
-mcp = FastMCP("Athena Tools")
-mcp.tool()(get_current_time)
-mcp.tool()(get_info)
+if FAST_MCP_AVAILABLE:
+    mcp = FastMCP("Athena Tools")
+
+    # Dynamic skill loading from skills directory
+    def _load_skills():
+        try:
+            from athena.skills import SkillEngine
+            from athena.memory import MemoryEngine
+            memory = MemoryEngine()
+            engine = SkillEngine(llm_generate_fn=lambda x: "", memory=memory)
+            for skill_info in engine.list_all():
+                func = engine.get(skill_info.function_name)
+                if func is not None:
+                    mcp.tool()(func)
+                    logger.info(f"[MCP] Registered skill: {skill_info.function_name}")
+        except Exception as e:
+            logger.warning(f"[MCP] Skill loading warning: {e}")
+
+    _load_skills()
 
 if __name__ == "__main__":
-    mcp.run()
+    if FAST_MCP_AVAILABLE:
+        mcp.run()
+    else:
+        print("[MCP] FastMCP is not installed.")

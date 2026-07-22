@@ -1,32 +1,73 @@
 [project]
 name = "athena"
-version = "0.1.0"
-description = "Athena Voice Assistant with MCP Tools"
+version = "0.2.0"
+description = "Athena - Lean Jarvis-like AI Assistant with Autonomous Skill Development"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastmcp>=2.0.0",
+    # Core LLM
+    "litellm>=1.40.0",
     "google-generativeai>=0.8.5",
-    "mcp>=1.9.0",
-    "piper-tts>=1.3.0",
-    "pytz>=2024.1",
-    "pynput>=1.8.1",
-    "python-dotenv>=1.1.1",
-    "rich>=14.1.0",
+    # Web API
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    # Voice I/O (lightweight CPU stack)
+    "faster-whisper>=1.0.0",
+    "piper-tts>=1.2.0",
+    "silero-vad>=5.0.0",
     "sounddevice>=0.5.2",
-    "vosk>=0.3.45",
+    "numpy>=1.26.0",
+    # TUI
+    "rich>=14.1.0",
+    # Config & Utils
+    "python-dotenv>=1.1.1",
+    "pydantic>=2.7.0",
+    "psutil>=5.9.0",
+    # Optional: Cloud TTS fallback
+    "edge-tts>=7.0.6",
+    "pillow>=12.2.0",
+]
+
+[project.optional-dependencies]
+# Advanced GPU voice stack (heavy)
+gpu-voice = [
+    "nemo_toolkit[asr]>=1.22.0",
+    "torch>=2.2.0",
+    "torchaudio>=2.2.0",
+    "kokoro>=0.8.4",
+]
+
+# Local LLM support
+local-llm = [
+    "llama-cpp-python>=0.2.85",
+]
+
+# Web search
+web-search = [
+    "duckduckgo-search>=8.1.1",
+]
+
+# Full install
+full = [
+    "nemo_toolkit[asr]>=1.22.0",
+    "torch>=2.2.0",
+    "torchaudio>=2.2.0",
+    "kokoro>=0.8.4",
+    "llama-cpp-python>=0.2.85",
+    "duckduckgo-search>=8.1.1",
+]
+
+dev = [
+    "black>=25.9.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.21.0",
 ]
 
 [project.scripts]
-athena = "core.base_assistant:run_assistant"
+athena = "main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[dependency-groups]
-dev = [
-    "black>=25.9.0",
-]
 
 [build-system]
 requires = ["setuptools>=61.0"]

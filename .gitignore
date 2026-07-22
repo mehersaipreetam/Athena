@@ -2,6 +2,8 @@
 __pycache__/
 *.py[codz]
 *$py.class
+*.db
+
 
 # C extensions
 *.so
@@ -208,3 +210,6 @@ __marimo__/
 
 # Speech Recognition Vosk model files
 vosk-model-*
+
+# Agents
+.agents/

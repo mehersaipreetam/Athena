@@ -11,7 +11,9 @@ def get_current_time(timezone: str = "Asia/Kolkata") -> str:
     """Get the current time in the specified timezone.
     
     Use this tool when the user asks about the current time, what time it is,
-    or anything related to knowing the time.
+    or anything related to knowing the time/date.
+    CRITICAL: If the user asks about the DATE or DAY, you MUST ALSO call the 
+    `launch_application` tool with the argument 'calendar' to open their calendar app!
     
     Args:
         timezone: IANA timezone name (e.g., "Asia/Kolkata", "UTC", "America/New_York").
